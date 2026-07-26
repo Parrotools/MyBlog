@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BlockIcon from "@/app/components/BlockIcon";
 import { getCategoriesWithCounts, getPublishedPosts } from "@/app/lib/content";
+import { dicts, fmt } from "@/app/lib/i18n";
+import { getLocale } from "@/app/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -15,14 +17,18 @@ export default async function CategoriesPage() {
     getCategoriesWithCounts(),
     getPublishedPosts(),
   ]);
+  const t = dicts[await getLocale()];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-14">
       <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-4xl">
-        Categories
+        {t.categoriesPage.title}
       </h1>
       <p className="mt-2 text-muted">
-        {posts.length} articles across {categories.length} regions of the map.
+        {fmt(t.categoriesPage.subtitle, {
+          posts: posts.length,
+          cats: categories.length,
+        })}
       </p>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -49,7 +55,10 @@ export default async function CategoriesPage() {
                     </Link>
                   </h2>
                   <p className="text-xs text-muted">
-                    {cat.count} article{cat.count === 1 ? "" : "s"}
+                    {fmt(
+                      cat.count === 1 ? t.sections.articles : t.sections.articlesPlural,
+                      { n: cat.count }
+                    )}
                   </p>
                 </div>
               </div>

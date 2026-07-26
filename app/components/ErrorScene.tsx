@@ -1,7 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import AsciiBackdrop, { type AsciiVariant } from "./AsciiBackdrop";
+import { useI18n } from "./I18nProvider";
 
 type Accent = "violet" | "amber" | "lime" | "red";
+
+/** each error page gets its own themed ASCII animation behind the art */
+const ASCII: Record<Accent, { variant: AsciiVariant; color: string }> = {
+  violet: { variant: "void", color: "#8b5cf6" },
+  amber: { variant: "lock", color: "#f59e0b" },
+  lime: { variant: "fire", color: "#84cc16" },
+  red: { variant: "glitch", color: "#ef4444" },
+};
 
 const THEME: Record<
   Accent,
@@ -54,6 +66,7 @@ export default function ErrorScene({
   art: ReactNode;
   children?: ReactNode;
 }) {
+  const { t: i18n } = useI18n();
   const t = THEME[accent];
   return (
     <div className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
@@ -63,6 +76,11 @@ export default function ErrorScene({
         />
         <div
           className={`absolute bottom-[-20%] right-[-8%] h-[24rem] w-[30rem] rounded-full blur-[120px] ${t.glowB}`}
+        />
+        <AsciiBackdrop
+          variant={ASCII[accent].variant}
+          color={ASCII[accent].color}
+          className="opacity-[0.42]"
         />
       </div>
 
@@ -91,7 +109,7 @@ export default function ErrorScene({
           href="/"
           className="shine rounded-full bg-heading px-5 py-2.5 text-sm font-semibold text-background transition-opacity hover:opacity-90"
         >
-          Respawn at home
+          {i18n.errors.respawn}
         </Link>
       </div>
     </div>

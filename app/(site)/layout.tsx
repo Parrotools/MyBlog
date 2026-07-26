@@ -1,5 +1,6 @@
 import SiteHeader from "@/app/components/SiteHeader";
 import SiteFooter from "@/app/components/SiteFooter";
+import SkyBackdrop from "@/app/components/SkyBackdrop";
 import { getProfile, getSiteConfig } from "@/app/lib/content";
 
 export default async function SiteLayout({
@@ -10,6 +11,7 @@ export default async function SiteLayout({
   const [site, profile] = await Promise.all([getSiteConfig(), getProfile()]);
   return (
     <>
+      <SkyBackdrop />
       <SiteHeader siteTitle={site.title} />
       <main className="flex flex-1 flex-col">{children}</main>
       <SiteFooter site={site} profile={profile} />

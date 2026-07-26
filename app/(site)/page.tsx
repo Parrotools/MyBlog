@@ -4,6 +4,7 @@ import MinecraftIntro from "@/app/intro/MinecraftIntro";
 import Avatar from "@/app/components/Avatar";
 import BlockIcon from "@/app/components/BlockIcon";
 import Hotbar from "@/app/components/Hotbar";
+import MagneticYoyo from "@/app/components/MagneticYoyo";
 import PlayerStats from "@/app/components/PlayerStats";
 import PostCard from "@/app/components/PostCard";
 import {
@@ -13,6 +14,8 @@ import {
   getProfile,
   getPublishedPosts,
 } from "@/app/lib/content";
+import { dicts, fmt } from "@/app/lib/i18n";
+import { getLocale } from "@/app/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +35,7 @@ export default async function Home({
       searchParams,
     ]);
   const latest = posts.slice(0, 4);
+  const t = dicts[await getLocale()];
   // the 3D intro plays once per browser session (cookie set on finish/skip);
   // /?intro=1 forces a replay any time
   const introSeen = params.intro !== "1" && cookieStore.has("intro_seen");
@@ -52,17 +56,17 @@ export default async function Home({
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-lime-400/25 bg-lime-400/10 px-4 py-1.5 text-xs font-medium text-accent">
               <span className="h-1.5 w-1.5 rounded-full bg-lime-400" />
-              You made it through the wall
+              {t.hero.badge}
             </p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-heading sm:text-6xl">
-              Hi, I&apos;m{" "}
+              {t.hero.hi}{" "}
               <span className="bg-gradient-to-r from-lime-400 to-emerald-500 bg-clip-text text-transparent">
                 {profile.name}
               </span>
-              .
+              {t.hero.hiEnd}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
-              {profile.tagline}. {profile.intro} This blog is a place to record:
+              {profile.intro} {t.hero.record}
             </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {profile.records.map((r) => (
@@ -79,13 +83,13 @@ export default async function Home({
                 href="/posts"
                 className="shine rounded-full bg-gradient-to-r from-lime-500 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_24px_rgba(132,204,22,0.35)] transition-transform hover:-translate-y-0.5"
               >
-                Read the blog
+                {t.hero.readBlog}
               </Link>
               <Link
                 href="/about"
                 className="press-btn rounded-full border border-line px-6 py-3 text-sm font-medium text-body"
               >
-                About me →
+                {t.hero.aboutMe}
               </Link>
             </div>
           </div>
@@ -99,8 +103,10 @@ export default async function Home({
         {/* ================= hotbar ================= */}
         <section className="mx-auto w-full max-w-5xl px-6 pb-20">
           <h2 className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            Daily hotbar{" "}
-            <span className="normal-case tracking-normal">— hover the slots</span>
+            {t.sections.hotbar}{" "}
+            <span className="normal-case tracking-normal">
+              {t.sections.hotbarHint}
+            </span>
           </h2>
           <div className="-mt-24 overflow-x-auto pb-2 pt-24">
             <Hotbar slots={hotbar} />
@@ -113,7 +119,7 @@ export default async function Home({
         {popular.length > 0 && (
           <section className="mx-auto w-full max-w-5xl px-6 py-14">
             <h2 className="mb-8 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-              ★ Popular posts
+              {t.sections.popular}
             </h2>
             <div className="grid gap-5 md:grid-cols-3">
               {popular.map((post) => (
@@ -127,13 +133,13 @@ export default async function Home({
         <section className="mx-auto w-full max-w-5xl px-6 pb-14">
           <div className="mb-8 flex items-baseline justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-              Latest posts
+              {t.sections.latest}
             </h2>
             <Link
               href="/posts"
               className="sweep-link text-sm text-muted hover:text-heading"
             >
-              View all {posts.length} →
+              {fmt(t.sections.viewAll, { n: posts.length })}
             </Link>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -143,10 +149,21 @@ export default async function Home({
           </div>
         </section>
 
+        {/* ================= hanging loot (magnetic yoyo) ================= */}
+        <section className="mx-auto w-full max-w-5xl px-6 pb-6">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
+            {t.sections.loot}{" "}
+            <span className="normal-case tracking-normal">
+              {t.sections.lootHint}
+            </span>
+          </h2>
+          <MagneticYoyo />
+        </section>
+
         {/* ================= categories ================= */}
         <section className="mx-auto w-full max-w-5xl px-6 pb-20">
           <h2 className="mb-8 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            Categories
+            {t.sections.categories}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((cat) => (

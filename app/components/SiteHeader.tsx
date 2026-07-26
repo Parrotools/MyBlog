@@ -3,21 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BlockIcon from "./BlockIcon";
+import { useI18n } from "./I18nProvider";
+import LangToggle from "./LangToggle";
 import SearchDialog from "./SearchDialog";
 import ThemeToggle from "./ThemeToggle";
 
-const NAV = [
-  { href: "/", label: "Home" },
-  { href: "/posts", label: "Posts" },
-  { href: "/categories", label: "Categories" },
-  { href: "/about", label: "About" },
-];
-
 export default function SiteHeader({ siteTitle }: { siteTitle: string }) {
   const pathname = usePathname();
+  const { t } = useI18n();
+  const NAV = [
+    { href: "/", label: t.nav.home },
+    { href: "/posts", label: t.nav.posts },
+    { href: "/categories", label: t.nav.categories },
+    { href: "/about", label: t.nav.about },
+  ];
 
   return (
-    <header className="site-header sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
+    <header className="site-header sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md transition-opacity duration-700">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-6 py-3.5">
         <Link href="/" className="group flex shrink-0 items-center gap-2.5">
           <BlockIcon
@@ -51,6 +53,7 @@ export default function SiteHeader({ siteTitle }: { siteTitle: string }) {
 
         <div className="flex items-center gap-2">
           <SearchDialog />
+          <LangToggle />
           <ThemeToggle />
         </div>
       </div>

@@ -4,8 +4,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import { I18nProvider } from "./components/I18nProvider";
 import PageJump from "./components/PageJump";
 import { getSiteConfig } from "./lib/content";
+import { getLocale } from "./lib/locale";
 import { SITE_URL } from "./lib/site";
 
 const geistSans = Geist({
@@ -37,28 +39,32 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
   return (
     <html
-      lang="en"
+      lang={locale === "zh" ? "zh-CN" : "en"}
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* transitions stay enabled on theme change so the sky cross-fades
+            like dawn/dusk when the user sets time day/night */}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
-          disableTransitionOnChange
         >
-          {children}
-          <Suspense fallback={null}>
-            <PageJump />
-          </Suspense>
+          <I18nProvider locale={locale}>
+            {children}
+            <Suspense fallback={null}>
+              <PageJump />
+            </Suspense>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

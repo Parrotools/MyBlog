@@ -137,7 +137,7 @@ async function main() {
   // ---- settings (only if missing — dashboard edits win)
   const defaults: Record<string, unknown> = {
     profile: {
-      name: "Zige",
+      name: "Parrotools",
       tagline: "Computer science undergrad",
       intro:
         "I train for ICPC, poke at AI systems, and deploy things on Linux — then write down what exploded.",
@@ -155,7 +155,7 @@ async function main() {
       { title: "Other Interests", items: ["Reading", "Music", "Sports"] },
     ],
     site: {
-      title: "Zige's Blog",
+      title: "Parrotools' Blog",
       description:
         "Algorithms, AI, backend engineering and the occasional explosion — a personal blog with a Minecraft-inspired 3D intro.",
       footerNote: "No creepers were harmed in the making of this website.",

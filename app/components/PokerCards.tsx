@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import BlockIcon from "./BlockIcon";
+import { useI18n } from "./I18nProvider";
 import type { BlockVariant } from "../lib/content";
 
 export interface CharacterCard {
@@ -31,32 +32,49 @@ const SLOTS = [
 const SWITCH_MS = 950;
 
 export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
+  const { t } = useI18n();
   const deck = cards.slice(0, SLOTS.length);
   const [order, setOrder] = useState(() => deck.map((_, i) => i));
-  // cards currently mid-flip, plus a nonce so re-flips restart the animation
-  const [flipping, setFlipping] = useState<ReadonlySet<number>>(new Set());
+  // cards currently mid-flip (with their direction), plus a nonce so
+  // re-flips restart the animation
+  const [flipping, setFlipping] = useState<ReadonlyMap<number, "front" | "back">>(
+    new Map()
+  );
+  // movers ride above the fan only for the first half of the flight; a
+  // card heading to the back drops its layer at the apex (edge-on in the
+  // flip), so it visibly tucks in behind the last card
+  const [elevated, setElevated] = useState<ReadonlySet<number>>(new Set());
   const [flipNonce, setFlipNonce] = useState(0);
-  const flipTimer = useRef<number | null>(null);
+  const flipTimers = useRef<number[]>([]);
 
   useEffect(() => {
-    return () => {
-      if (flipTimer.current) window.clearTimeout(flipTimer.current);
-    };
+    const pending = flipTimers.current;
+    return () => pending.forEach((t) => window.clearTimeout(t));
   }, []);
 
-  const beginFlip = (movers: number[]) => {
-    setFlipping(new Set(movers));
+  const beginFlip = (movers: Array<[number, "front" | "back"]>) => {
+    flipTimers.current.forEach((t) => window.clearTimeout(t));
+    flipTimers.current = [];
+    setFlipping(new Map(movers));
+    setElevated(new Set(movers.map(([id]) => id)));
     setFlipNonce((n) => n + 1);
-    if (flipTimer.current) window.clearTimeout(flipTimer.current);
-    flipTimer.current = window.setTimeout(
-      () => setFlipping(new Set()),
-      SWITCH_MS + 50
+    flipTimers.current.push(
+      window.setTimeout(() => {
+        // tuck: back-movers drop behind the fan at the apex
+        setElevated(
+          new Set(movers.filter(([, role]) => role === "front").map(([id]) => id))
+        );
+      }, SWITCH_MS * 0.45),
+      window.setTimeout(() => {
+        setFlipping(new Map());
+        setElevated(new Set());
+      }, SWITCH_MS + 50)
     );
   };
 
   /** front card cycles to the back of the hand */
   const shuffle = () => {
-    beginFlip([order[0]]);
+    beginFlip([[order[0], "back"]]);
     setOrder([...order.slice(1), order[0]]);
   };
 
@@ -66,7 +84,10 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
       shuffle();
       return;
     }
-    beginFlip([cardIndex, order[0]]);
+    beginFlip([
+      [cardIndex, "front"],
+      [order[0], "back"],
+    ]);
     setOrder([cardIndex, ...order.filter((i) => i !== cardIndex)]);
   };
 
@@ -91,6 +112,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
           const slot = order.indexOf(cardIndex);
           const front = slot === 0;
           const isFlipping = flipping.has(cardIndex);
+          const role = flipping.get(cardIndex);
           return (
             // outer: position in the fan (slow, smooth travel)
             <div
@@ -102,13 +124,28 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
               className="absolute left-9 top-16 h-[18rem] w-[13.5rem] transition-transform duration-[950ms] ease-[cubic-bezier(0.3,0.9,0.3,1)] sm:h-[20rem] sm:w-[15rem]"
               style={{
                 transform: SLOTS[slot],
-                zIndex: isFlipping ? 20 : SLOTS.length - slot,
+                zIndex: elevated.has(cardIndex)
+                  ? role === "front"
+                    ? 22
+                    : 21
+                  : SLOTS.length - slot,
                 perspective: "1100px",
                 filter: front
                   ? `drop-shadow(0 18px 30px ${card.color}44)`
                   : "drop-shadow(0 14px 24px rgba(0,0,0,0.45))",
               }}
             >
+              {/* arc: movers hop up and over, tucking in at the apex */}
+              <div
+                className="relative h-full w-full"
+                style={
+                  isFlipping
+                    ? {
+                        animation: `card-arc ${SWITCH_MS}ms ease-in-out both`,
+                      }
+                    : undefined
+                }
+              >
               {/* inner: the 3D flip while switching */}
               <div
                 key={isFlipping ? `flip-${flipNonce}` : "still"}
@@ -164,7 +201,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
                       ))}
                     </ul>
                     <p className="mt-auto pt-3 text-[10px] font-medium uppercase tracking-[0.2em] text-muted/60">
-                      Character card
+                      {t.about.characterCard}
                     </p>
                   </div>
 
@@ -197,16 +234,17 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
                     className="absolute bottom-3 left-0 right-0 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em]"
                     style={{ color: `${card.color}aa` }}
                   >
-                    Zige&apos;s deck
+                    {t.about.deck}
                   </span>
                 </div>
+              </div>
               </div>
             </div>
           );
         })}
 
         <p className="absolute bottom-0 left-9 text-xs text-muted/70 transition-colors group-hover/fan:text-accent">
-          ♠ Click any card to draw it forward
+          {t.about.drawHint}
         </p>
       </div>
     </div>

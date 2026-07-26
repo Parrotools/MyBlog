@@ -1,14 +1,17 @@
 import Link from "next/link";
 import BlockIcon from "./BlockIcon";
 import type { Profile, SiteConfig } from "../lib/content";
+import { dicts, fmt } from "../lib/i18n";
+import { getLocale } from "../lib/locale";
 
-export default function SiteFooter({
+export default async function SiteFooter({
   site,
   profile,
 }: {
   site: SiteConfig;
   profile: Profile;
 }) {
+  const t = dicts[await getLocale()];
   const socials = [
     {
       label: "GitHub",
@@ -64,15 +67,15 @@ export default function SiteFooter({
 
         <nav aria-label="Footer" className="text-sm">
           <p className="mb-3 font-semibold uppercase tracking-[0.2em] text-muted">
-            Explore
+            {t.footer.explore}
           </p>
           <ul className="space-y-2">
             {[
-              ["All posts", "/posts"],
-              ["Categories", "/categories"],
-              ["About me", "/about"],
-              ["RSS feed", "/feed.xml"],
-              ["Admin", "/admin"],
+              [t.footer.allPosts, "/posts"],
+              [t.footer.categories, "/categories"],
+              [t.footer.aboutMe, "/about"],
+              [t.footer.rss, "/feed.xml"],
+              [t.footer.admin, "/admin"],
             ].map(([label, href]) => (
               <li key={href}>
                 <Link href={href} className="sweep-link text-muted hover:text-heading">
@@ -85,7 +88,7 @@ export default function SiteFooter({
 
         <div className="text-sm">
           <p className="mb-3 font-semibold uppercase tracking-[0.2em] text-muted">
-            Find me
+            {t.footer.findMe}
           </p>
           <div className="flex gap-2">
             {socials.map((s) => (
@@ -112,10 +115,7 @@ export default function SiteFooter({
             <span className="inline-block cursor-crosshair hover:animate-[tnt-flash_0.4s_steps(2)_infinite]">
               <BlockIcon variant="tnt" className="h-5 w-5" />
             </span>
-            <span>
-              © 2026 {profile.name} — built with Next.js, Three.js and one block
-              of TNT
-            </span>
+            <span>{fmt(t.footer.builtWith, { name: profile.name })}</span>
           </div>
           {site.footerNote && (
             <p className="text-xs text-muted/70">{site.footerNote}</p>

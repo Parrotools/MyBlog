@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/app/components/I18nProvider";
 
 type UiPhase = "loading" | "tnt" | "reveal" | "gone";
 
 const MIN_LOAD_MS = 4200; // let the grass animation play at least this long
 
 export default function MinecraftIntro() {
+  const { t } = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -104,7 +106,13 @@ export default function MinecraftIntro() {
         if (target === 1 && shown > 0.99) shown = 1;
 
         const pct = Math.floor(shown * 100);
-        if (barRef.current) barRef.current.style.width = `${pct}%`;
+        if (barRef.current) {
+          const cells = barRef.current.children;
+          const filled = Math.round(shown * cells.length);
+          for (let ci = 0; ci < cells.length; ci++) {
+            (cells[ci] as HTMLElement).dataset.on = ci < filled ? "1" : "0";
+          }
+        }
         if (percentRef.current) percentRef.current.textContent = `${pct}%`;
 
         if (shown >= 1) {
@@ -156,29 +164,44 @@ export default function MinecraftIntro() {
       className="fixed inset-0 z-[60] bg-[#0b0c10]"
       aria-label="Intro animation"
     >
-      {/* while the intro is mounted, hide the site chrome — inline so it
-          works before hydration and vanishes when the overlay unmounts */}
-      <style>{`.site-header{visibility:hidden}`}</style>
+      {/* while the intro plays, hide the site chrome — inline so it works
+          before hydration. Removed when the reveal starts, so the header
+          FADES in under the dissolving overlay instead of popping. */}
+      {phase !== "reveal" && (
+        <style>{`.site-header{opacity:0;pointer-events:none}`}</style>
+      )}
       <canvas ref={canvasRef} className="block h-full w-full" />
 
-      {/* loading HUD */}
+      {/* loading HUD — HD take on the Minecraft XP bar */}
       {phase === "loading" && (
-        <div className="absolute inset-x-0 bottom-[11vh] flex flex-col items-center gap-4 px-6">
-          <p className="text-sm font-medium uppercase tracking-[0.35em] text-zinc-200/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-            Loading world
-          </p>
-          <div className="h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-white/10 backdrop-blur-sm">
+        <div className="absolute inset-x-0 bottom-[11vh] flex flex-col items-center px-6">
+          <div className="relative w-full max-w-md">
+            {/* percentage floats above the bar like the XP level number */}
+            <span
+              ref={percentRef}
+              className="absolute -top-10 left-1/2 -translate-x-1/2 text-2xl font-black tabular-nums text-[#8dff37]"
+              style={{
+                textShadow:
+                  "0 2px 0 rgba(12,32,0,0.95), 2px 0 0 rgba(12,32,0,0.95), -2px 0 0 rgba(12,32,0,0.95), 0 -2px 0 rgba(12,32,0,0.95), 0 0 18px rgba(125,255,42,0.45)",
+              }}
+            >
+              0%
+            </span>
+            {/* hotbar-style tray of 20 slots that fill with grass tiles */}
             <div
               ref={barRef}
-              className="h-full w-0 rounded-full bg-gradient-to-r from-lime-300 via-lime-400 to-emerald-500 shadow-[0_0_14px_rgba(163,230,53,0.8)] transition-none"
-            />
+              className="flex w-full items-center justify-center gap-[3px] rounded-lg border border-black/70 bg-[#15180f]/95 p-1.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.7),inset_0_-1px_0_rgba(255,255,255,0.06),0_2px_10px_rgba(0,0,0,0.5)]"
+            >
+              {Array.from({ length: 20 }, (_, i) => (
+                <div key={i} className="mc-load-cell" data-on="0">
+                  <span />
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-center text-xs font-medium uppercase tracking-[0.35em] text-zinc-300/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+              {t.intro.loadingWorld}
+            </p>
           </div>
-          <span
-            ref={percentRef}
-            className="text-xs font-medium tabular-nums text-zinc-400"
-          >
-            0%
-          </span>
         </div>
       )}
 
@@ -188,7 +211,7 @@ export default function MinecraftIntro() {
           onClick={() => setUiPhase("gone")}
           className="absolute right-5 top-5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-300 backdrop-blur-md transition-colors hover:bg-white/15 hover:text-white"
         >
-          Skip intro →
+          {t.intro.skip}
         </button>
       )}
 

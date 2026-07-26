@@ -223,7 +223,7 @@ export interface SiteConfig {
 }
 
 export const DEFAULT_PROFILE: Profile = {
-  name: "Zige",
+  name: "Parrotools",
   tagline: "Computer science undergrad",
   intro:
     "I train for ICPC, poke at AI systems, and deploy things on Linux — then write down what exploded.",
@@ -341,7 +341,7 @@ export const DEFAULT_INTERESTS: InterestGroup[] = [
 ];
 
 export const DEFAULT_SITE: SiteConfig = {
-  title: "Zige's Blog",
+  title: "Parrotools' Blog",
   description:
     "Algorithms, AI, backend engineering and the occasional explosion — a personal blog with a Minecraft-inspired 3D intro.",
   footerNote: "No creepers were harmed in the making of this website.",

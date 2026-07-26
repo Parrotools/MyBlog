@@ -1,6 +1,10 @@
-import BlockIcon from "./BlockIcon";
+import Avatar3D from "./Avatar3D";
 
-/** Profile avatar: uploaded image if set, otherwise the grass-block mark. */
+/**
+ * Profile avatar: uploaded image if set, otherwise a real-3D HD grass
+ * block (slow turntable + faint bob), keeping the hover hop on the
+ * wrapper.
+ */
 export default function Avatar({
   src,
   className,
@@ -19,10 +23,11 @@ export default function Avatar({
           className={`relative rounded-3xl border border-line object-cover drop-shadow-[0_24px_32px_rgba(0,0,0,0.45)] group-hover:animate-[mc-hop_0.6s_ease] ${className ?? "h-36 w-36"}`}
         />
       ) : (
-        <BlockIcon
-          variant="grass"
-          className={`relative drop-shadow-[0_24px_32px_rgba(0,0,0,0.45)] group-hover:animate-[mc-hop_0.6s_ease] ${className ?? "h-36 w-36"}`}
-        />
+        <div
+          className={`relative group-hover:animate-[mc-hop_0.6s_ease] ${className ?? "h-36 w-36"}`}
+        >
+          <Avatar3D className="h-full w-full" />
+        </div>
       )}
     </div>
   );

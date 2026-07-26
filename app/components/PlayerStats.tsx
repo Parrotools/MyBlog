@@ -1,4 +1,6 @@
 import type { Profile } from "../lib/content";
+import { dicts, fmt } from "../lib/i18n";
+import { getLocale } from "../lib/locale";
 
 /**
  * Player-style status card driven by profile data (admin → Profile):
@@ -24,16 +26,17 @@ function Heart() {
   );
 }
 
-export default function PlayerStats({ profile }: { profile: Profile }) {
+export default async function PlayerStats({ profile }: { profile: Profile }) {
+  const t = dicts[await getLocale()];
   const xp = Math.min(Math.max(profile.xpPercent, 0), 100);
   return (
     <div className="group/stats inline-flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5">
       <div className="flex items-center justify-between gap-8">
         <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-          Player status
+          {t.stats.title}
         </span>
         <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-mono text-[11px] text-accent">
-          Lv. {profile.level}
+          {t.stats.level} {profile.level}
         </span>
       </div>
 
@@ -52,7 +55,7 @@ export default function PlayerStats({ profile }: { profile: Profile }) {
         </div>
         <div className="mt-1.5 flex justify-between font-mono text-[10px] text-muted">
           <span>{profile.xpLabel}</span>
-          <span>next level: {profile.xpNext}</span>
+          <span>{fmt(t.stats.nextLevel, { next: profile.xpNext })}</span>
         </div>
       </div>
     </div>

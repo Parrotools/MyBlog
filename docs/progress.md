@@ -31,6 +31,44 @@ _Last updated: 2026-07-26 (post-session follow-ups included)_
   reduced-motion; safety timeout prevents a stuck curtain.
 - Real contact info everywhere (DB + seeds): 2261216827@qq.com,
   github.com/Parrotools.
+- **Minecraft HD sky backdrop** behind all blog pages (background only —
+  cards/poker/timeline designs untouched): day = sun + drifting blocky
+  voxel clouds; night = moon with craters, twinkling stars, dark clouds.
+  Theme toggle cross-fades like dawn/dusk; a wash gradient keeps content
+  readable; reduced-motion stops the drift.
+- **Intro loading bar** is now a hotbar-style tray of 20 inventory slots
+  that fill with mini grass tiles (pop-in bounce), with the percentage
+  floating above styled like the XP level number.
+- Hotbar tooltip edge-clipping fixed (edge slots anchor to their edge);
+  poker fan got top/left headroom so rotated/flipping cards never clip;
+  intro's 3×3 loader now fills bottom row first so falling blocks don't
+  pass through placed ones.
+- **ASCII animations** on error pages (procedural, JIEJOE-015-inspired):
+  404 void vortex, 403 vault rings, 500 rising fire, 400 glitch static —
+  canvas layers behind the existing art, reduced-motion still frame.
+- **Hexagon matrix** (JIEJOE-012-inspired) stagger-pops on the page-jump
+  curtain behind the spinner (canvas honeycomb).
+- Poker cards now **tuck behind** the hand: movers arc up, flip edge-on
+  at the apex, and drop their layer mid-flight (no more z-index pop).
+- Header now **fades in** as the intro reveal starts (no sudden pop).
+- Public identity switched to nickname **Parrotools** (DB + defaults +
+  card backs); real name removed from the site.
+- Daylight theme dimmed twice by request → now a muted slate palette
+  (#d8dee6 base, translucent gray-blue cards) — verified no glare.
+- **Parallax sky**: clouds are JS-driven with depth layers — pointer
+  position shifts each layer by its depth (near clouds most, sun/moon/
+  stars least, smooth lerp), and pointer movement speed boosts cloud
+  drift up to ~7× (verified: 20 → 33 px/s during sweeps), easing back
+  when idle. Reduced-motion gets a static sky.
+- ASCII error animations brightened (0.42 layer opacity, bold glyphs,
+  glow on hot cells) — clearly visible now.
+- Avatar block above Player Status is now a real Three.js 3D block using
+  the intro's HD procedural textures (slow turntable + bob, hover hop
+  kept, SVG fallback without WebGL).
+- **Magnetic yoyo "Hanging loot"** strip on the homepage (JIEJOE-013 /
+  qbitcapital-inspired): mini Minecraft blocks dangle on strings, repel
+  magnetically from the cursor and spring back with damped physics;
+  ambient sway when idle; static for reduced-motion.
 
 ## What has been completed
 

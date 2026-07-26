@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useI18n } from "./I18nProvider";
+import { fmt } from "../lib/i18n";
 
 interface Hit {
   slug: string;
@@ -12,6 +14,7 @@ interface Hit {
 }
 
 export default function SearchDialog() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
@@ -84,7 +87,7 @@ export default function SearchDialog() {
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" strokeLinecap="round" />
         </svg>
-        Search
+        {t.header.search}
         <kbd className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-[10px]">
           Ctrl K
         </kbd>
@@ -121,7 +124,7 @@ export default function SearchDialog() {
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search posts… (attention, ICPC, nginx)"
+                placeholder={t.search.placeholder}
                 className="w-full bg-transparent py-4 text-sm text-heading outline-none placeholder:text-muted"
               />
               <kbd className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted">
@@ -132,11 +135,11 @@ export default function SearchDialog() {
             <div className="max-h-[50vh] overflow-y-auto p-2">
               {query.trim().length < 2 ? (
                 <p className="px-3 py-6 text-center text-sm text-muted">
-                  Type at least 2 characters to search the world.
+                  {t.search.typeMore}
                 </p>
               ) : hits.length === 0 ? (
                 <p className="px-3 py-6 text-center text-sm text-muted">
-                  {loading ? "Mining…" : `No loot found for “${query}”.`}
+                  {loading ? t.search.mining : fmt(t.search.noLoot, { q: query })}
                 </p>
               ) : (
                 hits.map((hit) => (
