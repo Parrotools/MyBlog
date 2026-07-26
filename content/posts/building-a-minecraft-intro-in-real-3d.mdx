@@ -1,0 +1,62 @@
+---
+title: "Building a Minecraft Intro in Real 3D"
+date: "2026-07-26"
+excerpt: "HD procedural textures, an instanced block wall, rigid-body TNT physics and a camera flythrough — how the intro of this site works under the hood."
+category: "Frontend"
+tags: ["three.js", "physics", "next.js"]
+icon: "tnt"
+accent: "#ef4444"
+featured: true
+---
+
+The intro of this site is a five-act play: a stone wall, a grass-block loading animation, a falling TNT block, an explosion, and a camera that flies through the hole into the blog. This post walks through how each act is built — including the two bugs that almost shipped.
+
+## The stage: an instanced wall
+
+The wall looks like hundreds of individual blocks, and it is — but drawing ~1,500 meshes one by one would waste the GPU's time. It's a single `THREE.InstancedMesh`: one rounded-box geometry, one stone material, and a matrix per block. Two layers deep, with the back layer darkened per-instance to fake ambient occlusion, so the blast hole has a rim instead of a paper edge.
+
+## HD textures with zero image files
+
+Every texture is painted onto a `<canvas>` at runtime with multi-octave value noise — stone blotches, dirt grain, a wavy grass line, even the "TNT" lettering. No game assets are shipped; it's all procedural. A texture is just a function from coordinates to color:
+
+```ts
+const l =
+  0.4 +
+  0.24 * blotch(u, v) + // low-frequency shapes
+  (Math.random() - 0.5) * 0.035; // per-pixel grain
+const ao = edgeOcclusion(u, v); // darkened borders
+return [l * 255 * ao, l * 255 * ao, l * 255 * ao];
+```
+
+The edge-occlusion trick matters more than it looks: darkening each face near its borders is what makes a flat texture read as a **block** once it's wrapped around a cube.
+
+## Real physics, really
+
+The TNT is a rigid body in [cannon-es](https://github.com/pmndrs/cannon-es). It spawns above the viewport, falls under real gravity with a touch of spin, lands on an invisible pedestal, bounces, and settles. When it detonates, every block carved out of the wall becomes its own rigid body with an impulse pointing away from the blast — so debris tumbles, collides with other debris, and arcs under gravity instead of following hand-authored curves.
+
+## Bug #1: the TNT that rolled off the world
+
+A cube dropped from ten meters hits at about $v = \sqrt{2gh} \approx 14\ \text{m/s}$. My first landing pad was a thin static box — and at that speed the TNT sometimes passed straight through it between physics steps (tunneling), or clipped an edge, ricocheted sideways and rolled off into the void. The fuse never lit; visitors would have stared at an intact wall forever.
+
+Three fixes, all boring and all necessary:
+
+- Make the pedestal 4 units deep so one timestep can't skip it.
+- On contact, kill most of the angular velocity — an inelastic landing that reads as "heavy crate" instead of "die roll".
+- A safety net: if the block somehow ends up below the world, teleport it back above the screen and drop it again.
+
+## Bug #2: the negative timestep
+
+The loading bar once hit 100% two seconds early and launched the TNT while the grass animation was still playing. The culprit: generating all those procedural textures blocks the main thread for a moment, and the first `requestAnimationFrame` timestamp after a long block can be **older** than a `performance.now()` captured during it. My frame delta came out negative, flipped the sign of a lerp, and catapulted the progress bar past 100%.
+
+```ts
+// robust to rAF throttling AND stale first-frame timestamps
+const dt = Math.max(0, Math.min((now - last) / 1000, 0.3));
+```
+
+One `Math.max(0, …)`. Hours of confusion. Clamp your deltas, friends — in both directions.
+
+## The exit
+
+After the debris clears, the camera eases from its seat straight through the hole while a white overlay fades in, and the overlay unmounts to reveal the blog underneath — which was server-rendered and sitting there the whole time. The "website behind the wall" isn't a metaphor; it's the DOM.
+
+> Special effects are just state machines wearing makeup.

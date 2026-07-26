@@ -1,0 +1,63 @@
+---
+title: "My ICPC Training Notes: A System, Not a Grind"
+date: "2026-07-18"
+excerpt: "How I structure competitive programming practice — virtual contests, upsolving discipline, a C++ template that stays out of the way, and the bugs I keep re-learning."
+category: "Algorithm"
+tags: ["ICPC", "competitive-programming", "C++"]
+icon: "stone"
+accent: "#38bdf8"
+---
+
+Grinding random problems feels like progress the same way digging a 1×1 hole straight down feels like mining. You're busy, blocks are breaking, and you're learning almost nothing you'll use in a contest. These notes are the system I actually follow.
+
+## The weekly loop
+
+- **Two virtual contests** at real timing, with a teammate when possible. Contests train the skill that problem lists can't: deciding *what to solve next* under a clock.
+- **Upsolve everything** within 48 hours. A contest where you solved 4/10 is a curated list of 6 problems at exactly your frontier — the most valuable problem set money can't buy.
+- **One topic block per week** (say, DSU on trees, or flows) — 4–6 problems from easy to painful, so the pattern compiles into intuition.
+
+## The template philosophy
+
+My template fits on one screen. Every line I don't understand under pressure is a liability, not a convenience.
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+int main() {
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t = 1;
+    // cin >> t;
+    while (t--) {
+        // solve();
+    }
+    return 0;
+}
+```
+
+That's it. Debug macros and geometry libraries live in a separate file I paste when a problem earns them.
+
+## The bugs I keep re-learning
+
+Every competitive programmer has a personal loop of shame. Mine, in order of lifetime WA count:
+
+- **Overflow.** $10^5$ values of size $10^9$ summed in an `int`. The compiler will not save you; `ll` will.
+- **Binary search boundaries.** I now write one canonical form and never improvise:
+
+```cpp
+// smallest x in [lo, hi] with pred(x) == true
+while (lo < hi) {
+    ll mid = lo + (hi - lo) / 2;
+    if (pred(mid)) hi = mid;
+    else lo = mid + 1;
+}
+```
+
+- **Reading the wrong problem.** Not a typo class — a comprehension class. The fix is mechanical: restate the task in one sentence *before* opening the editor, and check the sentence against the samples.
+
+## On rating anxiety
+
+Rating is a noisy measurement of a lagging indicator. The leading indicators are boring: contests completed, problems upsolved, topics closed out. Optimize the inputs and the number follows — grieve bad rounds for exactly one meal, then queue the next virtual.
+
+> Practice the decision, not just the algorithm. Contests are won in the minute where you choose which problem deserves your next hour.

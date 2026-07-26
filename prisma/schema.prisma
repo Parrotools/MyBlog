@@ -1,0 +1,95 @@
+// Prisma schema — SQLite in dev; written to be PostgreSQL-compatible
+// (no enums, no SQLite-only types). To move to Postgres: change provider,
+// set DATABASE_URL, re-create migrations with `prisma migrate dev`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  avatar       String?
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id // random 256-bit token (hex)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String    @default("")
+  icon        String    @default("stone")
+  articles    Article[]
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  articles Article[]
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  summary     String    @default("")
+  content     String    @default("")
+  coverImage  String?
+  icon        String    @default("grass")
+  accent      String    @default("#84cc16")
+  status      String    @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
+  featured    Boolean   @default(false)
+  viewCount   Int       @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags        Tag[]
+
+  @@index([status, publishedAt])
+}
+
+model Project {
+  id          String  @id @default(cuid())
+  name        String
+  description String  @default("")
+  tech        String  @default("") // comma-separated list
+  githubUrl   String?
+  demoUrl     String?
+  image       String?
+  status      String  @default("active") // active | in-progress | archived
+  sortOrder   Int     @default(0)
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  filename  String // original name
+  path      String   @unique // stored name under UPLOADS_DIR
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+}
+
+// free-form JSON blobs keyed by name: "profile", "interests", "site"
+model Setting {
+  key   String @id
+  value String
+}

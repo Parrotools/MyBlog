@@ -1,0 +1,102 @@
+---
+title: "A Calm Guide to Deploying on a Linux Server"
+date: "2026-07-15"
+excerpt: "From a bare VPS to a hardened box serving a real app: users, ufw, systemd, nginx as a reverse proxy, and HTTPS — the boring checklist that keeps 3 a.m. quiet."
+category: "Backend"
+tags: ["Linux", "deployment", "nginx", "devops"]
+icon: "iron"
+accent: "#22c55e"
+---
+
+Every app I've deployed by hand has taught me the same lesson: production incidents are almost never exotic. They're a missing restart policy, an open port, an expired certificate. This is the checklist I run so those things can't happen — in the order I run it.
+
+## 1. First five minutes: stop being root
+
+```bash
+adduser deploy
+usermod -aG sudo deploy
+rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
+```
+
+Then in `/etc/ssh/sshd_config`: `PermitRootLogin no`, `PasswordAuthentication no`. Keys only, always. This single step removes the most common way small servers die.
+
+## 2. Firewall before software
+
+```bash
+ufw default deny incoming
+ufw allow OpenSSH
+ufw allow 'Nginx Full'
+ufw enable
+```
+
+The app itself will listen on `127.0.0.1:3000` — never exposed directly. If a port isn't in this list, the internet doesn't get to ask.
+
+## 3. The app is a systemd service, not a terminal tab
+
+`tmux` is for experiments. Production processes belong to the init system, which restarts them, journals them, and starts them on boot:
+
+```ini
+# /etc/systemd/system/myblog.service
+[Unit]
+Description=myblog (Next.js)
+After=network.target
+
+[Service]
+User=deploy
+WorkingDirectory=/srv/myblog
+ExecStart=/usr/bin/node node_modules/.bin/next start -p 3000
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`systemctl enable --now myblog`, then read your logs with `journalctl -u myblog -f`.
+
+## 4. nginx in front
+
+The app server should never face the internet naked. nginx terminates TLS, buffers slow clients, serves static files, and gives you one place to reason about traffic:
+
+```nginx
+server {
+    server_name example.com;
+
+    location /_next/static/ {
+        alias /srv/myblog/.next/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## 5. HTTPS is one command now
+
+```bash
+certbot --nginx -d example.com
+```
+
+Certbot edits the nginx config, sets up the redirect, and installs a renewal timer. Verify the timer exists — `systemctl list-timers | grep certbot` — because "the cert expired" is the most preventable outage in the industry.
+
+## The checklist
+
+| Item | Test that proves it |
+| --- | --- |
+| SSH hardened | `ssh root@host` fails; key login works |
+| Firewall on | `nmap` from outside shows 22, 80, 443 only |
+| Service survives reboot | `reboot`, then curl the site |
+| Service survives crash | `kill -9` the node process, watch it return |
+| TLS auto-renews | `certbot renew --dry-run` |
+| Logs somewhere | `journalctl -u myblog` has today's entries |
+
+Six rows. Maybe an hour the first time, fifteen minutes once it's muscle memory.
+
+> Boring deployments are a skill. The goal isn't to feel clever at deploy time — it's to feel nothing at 3 a.m.

@@ -1,0 +1,37 @@
+# Local/production deployment.
+#
+# Default: SQLite on a volume (simplest possible deployment).
+# For PostgreSQL: uncomment the db service + the postgres DATABASE_URL,
+# switch prisma/schema.prisma provider to "postgresql", and re-create
+# migrations (`npx prisma migrate dev`).
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "file:/data/blog.db"
+      # DATABASE_URL: "postgresql://blog:blog@db:5432/blog"
+      SESSION_SECRET: "${SESSION_SECRET:?set SESSION_SECRET in .env}"
+      NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}"
+      UPLOADS_DIR: /data/uploads
+    volumes:
+      - blog-data:/data
+    restart: unless-stopped
+    # depends_on:
+    #   - db
+
+  # db:
+  #   image: postgres:17-alpine
+  #   environment:
+  #     POSTGRES_USER: blog
+  #     POSTGRES_PASSWORD: blog
+  #     POSTGRES_DB: blog
+  #   volumes:
+  #     - pg-data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+volumes:
+  blog-data:
+  # pg-data:

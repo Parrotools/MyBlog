@@ -1,0 +1,80 @@
+---
+title: "Understanding Transformer Attention, From the Matrices Up"
+date: "2026-07-24"
+excerpt: "Attention is three matrix multiplications and a softmax. This post builds it from scratch: what Q, K and V mean, why we divide by √d, and what multi-head actually buys you."
+category: "AI"
+tags: ["AI", "deep-learning", "LLM", "PyTorch"]
+icon: "redstone"
+accent: "#8b5cf6"
+featured: true
+---
+
+Every explanation of the Transformer eventually shows the same formula and moves on. Let's not move on. Let's stare at it until every symbol earns its place:
+
+$$
+\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+$$
+
+## The problem attention solves
+
+A token's meaning depends on context. In "the **bank** of the river", *bank* should borrow meaning from *river*. Recurrent networks passed context along token by token, like villagers whispering down a line — slow, and the message degrades. Attention instead lets **every token look at every other token directly** and decide, per pair, how much to listen.
+
+## Q, K, V: a lookup table that's differentiable
+
+Each token's embedding $x_i \in \mathbb{R}^{d}$ is projected three ways:
+
+$$
+q_i = W_Q x_i, \qquad k_i = W_K x_i, \qquad v_i = W_V x_i
+$$
+
+A useful mental model is a soft hash map:
+
+- the **query** $q_i$ is what token $i$ is looking for,
+- the **key** $k_j$ is what token $j$ advertises about itself,
+- the **value** $v_j$ is what token $j$ actually hands over if selected.
+
+The score $q_i \cdot k_j$ measures how well the advertisement matches the search. Stack the vectors into matrices and all pairwise scores become one multiplication: $QK^\top$ is an $n \times n$ grid of "how much should $i$ listen to $j$".
+
+## Why divide by √d?
+
+If the components of $q$ and $k$ are independent with zero mean and unit variance, their dot product over $d_k$ dimensions has variance $d_k$:
+
+$$
+\mathrm{Var}(q \cdot k) = \sum_{t=1}^{d_k} \mathrm{Var}(q_t k_t) = d_k
+$$
+
+With $d_k = 128$, raw scores routinely reach magnitude $\pm 20$. Push that through a softmax and you get a one-hot distribution — gradients die, training stalls. Dividing by $\sqrt{d_k}$ renormalizes the scores to unit variance, keeping the softmax in its sensitive, trainable regime. One square root, and the difference between a model that learns and one that doesn't.
+
+## The whole thing in code
+
+```python
+import torch
+import torch.nn.functional as F
+
+def attention(q, k, v, mask=None):
+    # q, k, v: (batch, heads, seq, d_k)
+    d_k = q.size(-1)
+    scores = q @ k.transpose(-2, -1) / d_k**0.5   # (batch, heads, seq, seq)
+    if mask is not None:
+        scores = scores.masked_fill(mask == 0, float("-inf"))
+    weights = F.softmax(scores, dim=-1)
+    return weights @ v                             # (batch, heads, seq, d_k)
+```
+
+Three matmuls, one softmax. Everything else in a Transformer — LayerNorm, residuals, MLPs — is scaffolding to make stacking this operation stable.
+
+## What multi-head buys you
+
+One attention pattern per layer is a bottleneck: syntax, coreference and positional habits all compete for the same $n \times n$ grid. Multi-head runs $h$ small attentions in parallel subspaces ($d_k = d/h$ each) and concatenates the results — cheap, because the total compute matches one full-width head. Different heads reliably learn different relations; interpretability work keeps finding heads that track syntax trees, previous-token copies, or induction patterns.
+
+## Why it scaled when RNNs didn't
+
+| | Self-attention | RNN |
+| --- | --- | --- |
+| Ops per layer | $O(n^2 \cdot d)$ | $O(n \cdot d^2)$ |
+| Sequential steps | $O(1)$ | $O(n)$ |
+| Longest gradient path | $O(1)$ | $O(n)$ |
+
+The $n^2$ looks scary, but the other two rows are the story: every token pair connects in one step, and the whole layer is one batched matmul — exactly the shape GPUs are built for. Recurrence had better asymptotics in $n$ and lost anyway, because it couldn't parallelize.
+
+> Attention isn't magic. It's a differentiable lookup table with good ergonomics for GPUs — and that turned out to be enough to change the field.
