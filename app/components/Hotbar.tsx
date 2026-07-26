@@ -35,8 +35,12 @@ export default function Hotbar({ slots }: { slots: HotbarSlot[] }) {
             {i + 1}
           </span>
 
-          {/* Minecraft-style item tooltip */}
-          <div className="mc-tooltip">
+          {/* Minecraft-style item tooltip; edge slots anchor to their edge */}
+          <div
+            className={`mc-tooltip ${
+              i <= 1 ? "mc-tooltip-start" : i >= 7 ? "mc-tooltip-end" : ""
+            }`}
+          >
             <p
               className="text-[13px] font-semibold"
               style={{ color: slot.rarity || "#ffffff" }}

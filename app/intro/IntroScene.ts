@@ -560,6 +560,9 @@ export class IntroScene {
     const PLACE = 0.24; // seconds between block drops
     const HOLD = 0.55; // full grid on screen
     const CLEAR = 0.3; // shrink away
+    // fill bottom row first, then middle, then top — blocks drop in from
+    // above, so this order keeps them from falling through placed ones
+    const PLACE_RANK = [6, 7, 8, 3, 4, 5, 0, 1, 2];
     const cycle = 9 * PLACE + HOLD + CLEAR;
     const prev = this.loaderCycleT;
     this.loaderCycleT = this.phaseT % cycle;
@@ -576,7 +579,7 @@ export class IntroScene {
     for (let i = 0; i < 9; i++) {
       const block = this.loaderBlocks[i];
       const state = this.loaderStates[i];
-      const placedAt = i * PLACE;
+      const placedAt = PLACE_RANK[i] * PLACE;
       if (ct < placedAt) continue;
 
       if (ct < 9 * PLACE + HOLD) {

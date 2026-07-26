@@ -73,7 +73,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
   if (deck.length === 0) return null;
 
   return (
-    <div className="overflow-x-auto pb-4 pt-2">
+    <div className="overflow-x-auto pb-4 pt-4">
       <div
         role="button"
         tabIndex={0}
@@ -85,7 +85,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
             shuffle();
           }
         }}
-        className="group/fan relative h-[22rem] w-[46rem] shrink-0 cursor-pointer select-none outline-none sm:h-[24rem] sm:w-[52rem]"
+        className="group/fan relative h-[26rem] w-[48rem] shrink-0 cursor-pointer select-none outline-none sm:h-[28rem] sm:w-[54rem]"
       >
         {deck.map((card, cardIndex) => {
           const slot = order.indexOf(cardIndex);
@@ -99,7 +99,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
                 e.stopPropagation();
                 draw(cardIndex);
               }}
-              className="absolute left-2 top-4 h-[18rem] w-[13.5rem] transition-transform duration-[950ms] ease-[cubic-bezier(0.3,0.9,0.3,1)] sm:h-[20rem] sm:w-[15rem]"
+              className="absolute left-9 top-16 h-[18rem] w-[13.5rem] transition-transform duration-[950ms] ease-[cubic-bezier(0.3,0.9,0.3,1)] sm:h-[20rem] sm:w-[15rem]"
               style={{
                 transform: SLOTS[slot],
                 zIndex: isFlipping ? 20 : SLOTS.length - slot,
@@ -205,7 +205,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
           );
         })}
 
-        <p className="absolute -bottom-1 left-2 text-xs text-muted/70 transition-colors group-hover/fan:text-accent">
+        <p className="absolute bottom-0 left-9 text-xs text-muted/70 transition-colors group-hover/fan:text-accent">
           ♠ Click any card to draw it forward
         </p>
       </div>

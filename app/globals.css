@@ -235,6 +235,26 @@ body {
   transform: translate(-50%, 0) scale(1);
 }
 
+/* edge slots: anchor the tooltip to the slot's edge instead of centering,
+   so it can never poke out of the scroll container and get clipped */
+.mc-tooltip.mc-tooltip-start {
+  left: 0;
+  transform: translate(0, 8px) scale(0.96);
+}
+.group\/slot:hover .mc-tooltip.mc-tooltip-start,
+.group\/slot:focus-visible .mc-tooltip.mc-tooltip-start {
+  transform: translate(0, 0) scale(1);
+}
+.mc-tooltip.mc-tooltip-end {
+  left: auto;
+  right: 0;
+  transform: translate(0, 8px) scale(0.96);
+}
+.group\/slot:hover .mc-tooltip.mc-tooltip-end,
+.group\/slot:focus-visible .mc-tooltip.mc-tooltip-end {
+  transform: translate(0, 0) scale(1);
+}
+
 /* --- rotating conic border sweep on cards --- */
 @property --mc-angle {
   syntax: "<angle>";
