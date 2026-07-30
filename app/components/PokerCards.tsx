@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import BlockIcon from "./BlockIcon";
-import { useI18n } from "./I18nProvider";
 import type { BlockVariant } from "../lib/content";
 
 export interface CharacterCard {
@@ -32,7 +31,6 @@ const SLOTS = [
 const SWITCH_MS = 950;
 
 export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
-  const { t } = useI18n();
   const deck = cards.slice(0, SLOTS.length);
   const [order, setOrder] = useState(() => deck.map((_, i) => i));
   // cards currently mid-flip (with their direction), plus a nonce so
@@ -201,7 +199,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
                       ))}
                     </ul>
                     <p className="mt-auto pt-3 text-[10px] font-medium uppercase tracking-[0.2em] text-muted/60">
-                      {t.about.characterCard}
+                      Character card
                     </p>
                   </div>
 
@@ -234,7 +232,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
                     className="absolute bottom-3 left-0 right-0 text-center font-mono text-[10px] font-bold uppercase tracking-[0.3em]"
                     style={{ color: `${card.color}aa` }}
                   >
-                    {t.about.deck}
+                    Parrotools&apos; deck
                   </span>
                 </div>
               </div>
@@ -244,7 +242,7 @@ export default function PokerCards({ cards }: { cards: CharacterCard[] }) {
         })}
 
         <p className="absolute bottom-0 left-9 text-xs text-muted/70 transition-colors group-hover/fan:text-accent">
-          {t.about.drawHint}
+          ♠ Click any card to draw it forward
         </p>
       </div>
     </div>

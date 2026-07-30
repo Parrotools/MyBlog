@@ -3,7 +3,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import AsciiBackdrop, { type AsciiVariant } from "./AsciiBackdrop";
-import { useI18n } from "./I18nProvider";
 
 type Accent = "violet" | "amber" | "lime" | "red";
 
@@ -66,7 +65,6 @@ export default function ErrorScene({
   art: ReactNode;
   children?: ReactNode;
 }) {
-  const { t: i18n } = useI18n();
   const t = THEME[accent];
   return (
     <div className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
@@ -109,7 +107,7 @@ export default function ErrorScene({
           href="/"
           className="shine rounded-full bg-heading px-5 py-2.5 text-sm font-semibold text-background transition-opacity hover:opacity-90"
         >
-          {i18n.errors.respawn}
+          Respawn at home
         </Link>
       </div>
     </div>

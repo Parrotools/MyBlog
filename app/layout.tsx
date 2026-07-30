@@ -4,10 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "katex/dist/katex.min.css";
 import "./globals.css";
-import { I18nProvider } from "./components/I18nProvider";
 import PageJump from "./components/PageJump";
 import { getSiteConfig } from "./lib/content";
-import { getLocale } from "./lib/locale";
 import { SITE_URL } from "./lib/site";
 
 const geistSans = Geist({
@@ -44,10 +42,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
   return (
     <html
-      lang={locale === "zh" ? "zh-CN" : "en"}
+      lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
@@ -59,12 +56,10 @@ export default async function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
         >
-          <I18nProvider locale={locale}>
-            {children}
-            <Suspense fallback={null}>
-              <PageJump />
-            </Suspense>
-          </I18nProvider>
+          {children}
+          <Suspense fallback={null}>
+            <PageJump />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

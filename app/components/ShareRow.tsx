@@ -1,5 +1,3 @@
-import { dicts } from "../lib/i18n";
-import { getLocale } from "../lib/locale";
 import { SITE_URL } from "../lib/site";
 
 /** Share links for a post — no tracking scripts, just intent URLs. */
@@ -10,7 +8,6 @@ export default async function ShareRow({
   slug: string;
   title: string;
 }) {
-  const t = dicts[await getLocale()];
   const url = `${SITE_URL}/posts/${slug}`;
   const eUrl = encodeURIComponent(url);
   const eTitle = encodeURIComponent(title);
@@ -36,7 +33,7 @@ export default async function ShareRow({
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-        {t.article.share}
+        Share
       </span>
       <div className="flex gap-2">
         {targets.map((t) => (

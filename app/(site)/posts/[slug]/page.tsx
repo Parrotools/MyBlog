@@ -7,8 +7,6 @@ import TableOfContents from "@/app/components/TableOfContents";
 import ViewBeacon from "@/app/components/ViewBeacon";
 import { getSessionUser } from "@/app/lib/auth";
 import { getPostBySlug, getPublishedPosts } from "@/app/lib/content";
-import { dicts, fmt } from "@/app/lib/i18n";
-import { getLocale } from "@/app/lib/locale";
 import { renderMarkdown } from "@/app/lib/markdown";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +48,6 @@ export default async function PostPage({
     renderMarkdown(post.content),
     getPublishedPosts(),
   ]);
-  const t = dicts[await getLocale()];
   const idx = all.findIndex((p) => p.slug === post.slug);
   const newer = idx > 0 ? all[idx - 1] : null;
   const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
@@ -71,12 +68,12 @@ export default async function PostPage({
             href="/posts"
             className="sweep-link text-sm text-muted hover:text-heading"
           >
-            {t.article.allPosts}
+            ← All posts
           </Link>
 
           {post.status !== "PUBLISHED" && (
             <p className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-sm text-amber-500">
-              {post.status === "DRAFT" ? t.article.draft : t.article.archived}
+              {post.status === "DRAFT" ? "Draft preview — only admins can see this page." : "Archived — only admins can see this page."}
             </p>
           )}
 
@@ -96,9 +93,9 @@ export default async function PostPage({
             <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-xs text-muted">
               <time dateTime={post.date}>{post.date}</time>
               <span aria-hidden="true">·</span>
-              <span>{fmt(t.post.minRead, { n: post.readMinutes })}</span>
+              <span>{post.readMinutes} min read</span>
               <span aria-hidden="true">·</span>
-              <span>{fmt(t.post.views, { n: post.views })}</span>
+              <span>{post.views} views</span>
               <span aria-hidden="true">·</span>
               <div className="flex gap-1.5">
                 {post.tags.map((tag) => (
@@ -127,7 +124,7 @@ export default async function PostPage({
           {post.headings.length > 0 && (
             <details className="mt-8 rounded-2xl border border-line bg-surface p-4 lg:hidden">
               <summary className="cursor-pointer text-sm font-semibold text-heading">
-                {t.article.contents}
+                Contents
               </summary>
               <ul className="mt-3 space-y-1.5 text-sm">
                 {post.headings.map((h) => (
@@ -157,7 +154,7 @@ export default async function PostPage({
                 className="shine group rounded-2xl border border-line bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-accent/40"
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-muted">
-                  {t.article.older}
+                  ← Older
                 </p>
                 <p className="sweep-link mt-2 font-semibold text-heading">
                   {older.title}
@@ -172,7 +169,7 @@ export default async function PostPage({
                 className="shine group rounded-2xl border border-line bg-surface p-5 text-right transition-all hover:-translate-y-0.5 hover:border-accent/40"
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-muted">
-                  {t.article.newer}
+                  Newer →
                 </p>
                 <p className="sweep-link mt-2 font-semibold text-heading">
                   {newer.title}
@@ -191,7 +188,7 @@ export default async function PostPage({
               href="#"
               className="mt-6 inline-block text-xs text-muted transition-colors hover:text-accent"
             >
-              {t.article.backToTop}
+              ↑ Back to top
             </a>
           </div>
         </aside>

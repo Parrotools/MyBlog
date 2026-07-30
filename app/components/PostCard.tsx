@@ -1,11 +1,8 @@
 import Link from "next/link";
 import BlockIcon from "./BlockIcon";
 import type { PostView } from "../lib/content";
-import { dicts, fmt } from "../lib/i18n";
-import { getLocale } from "../lib/locale";
 
 export default async function PostCard({ post }: { post: PostView }) {
-  const t = dicts[await getLocale()];
   return (
     <article
       className="mc-card group relative flex flex-col gap-3 rounded-2xl border border-line bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_44px_-12px_var(--card-accent)]"
@@ -27,7 +24,7 @@ export default async function PostCard({ post }: { post: PostView }) {
       <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs text-muted">
         <time dateTime={post.date}>{post.date}</time>
         <span aria-hidden="true">·</span>
-        <span>{fmt(t.post.minRead, { n: post.readMinutes })}</span>
+        <span>{post.readMinutes} min read</span>
         {post.views > 0 && (
           <>
             <span aria-hidden="true">·</span>
@@ -64,7 +61,7 @@ export default async function PostCard({ post }: { post: PostView }) {
           ))}
         </div>
         <span className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 max-sm:hidden -translate-x-2">
-          {t.post.read}
+          Read
           <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M3 8h9M9 4.5 12.5 8 9 11.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

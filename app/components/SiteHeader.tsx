@@ -3,19 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BlockIcon from "./BlockIcon";
-import { useI18n } from "./I18nProvider";
-import LangToggle from "./LangToggle";
 import SearchDialog from "./SearchDialog";
 import ThemeToggle from "./ThemeToggle";
 
 export default function SiteHeader({ siteTitle }: { siteTitle: string }) {
   const pathname = usePathname();
-  const { t } = useI18n();
   const NAV = [
-    { href: "/", label: t.nav.home },
-    { href: "/posts", label: t.nav.posts },
-    { href: "/categories", label: t.nav.categories },
-    { href: "/about", label: t.nav.about },
+    { href: "/", label: "Home" },
+    { href: "/posts", label: "Posts" },
+    { href: "/categories", label: "Categories" },
+    { href: "/about", label: "About" },
   ];
 
   return (
@@ -53,7 +50,6 @@ export default function SiteHeader({ siteTitle }: { siteTitle: string }) {
 
         <div className="flex items-center gap-2">
           <SearchDialog />
-          <LangToggle />
           <ThemeToggle />
         </div>
       </div>

@@ -1,22 +1,19 @@
 import type { Metadata } from "next";
 import ErrorScene from "@/app/components/ErrorScene";
 import { RedstoneGlitch } from "@/app/components/ErrorArt";
-import { dicts } from "@/app/lib/i18n";
-import { getLocale } from "@/app/lib/locale";
 
 export const metadata: Metadata = {
   title: "400 — Unknown command",
 };
 
-export default async function BadRequest() {
-  const t = dicts[await getLocale()].errors.e400;
+export default function BadRequest() {
   return (
     <ErrorScene
       accent="red"
       code="400"
-      quip={t.quip}
-      title={t.title}
-      description={t.desc}
+      quip="Unknown or incomplete command"
+      title="That request didn't parse"
+      description="The server read your request the way a command block reads a typo — red particles everywhere, nothing executed. Check the syntax and try again."
       art={<RedstoneGlitch />}
     />
   );

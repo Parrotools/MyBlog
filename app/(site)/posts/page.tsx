@@ -6,8 +6,6 @@ import {
   getPublishedPosts,
   getTagsWithCounts,
 } from "@/app/lib/content";
-import { dicts, fmt } from "@/app/lib/i18n";
-import { getLocale } from "@/app/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +25,6 @@ export default async function PostsPage({
     getCategoriesWithCounts(),
     getTagsWithCounts(),
   ]);
-  const t = dicts[await getLocale()];
 
   const posts = all.filter(
     (p) =>
@@ -38,12 +35,12 @@ export default async function PostsPage({
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-14">
       <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-4xl">
-        {t.postsPage.title}
+        All posts
       </h1>
       <p className="mt-2 text-muted">
-        {fmt(t.postsPage.showing, { shown: posts.length, total: all.length })}
-        {category ? fmt(t.postsPage.inCategory, { name: category }) : ""}
-        {tag ? fmt(t.postsPage.withTag, { tag }) : ""}
+        {posts.length} of {all.length} articles
+        {category ? ` in ${category}` : ""}
+        {tag ? ` tagged #${tag}` : ""}
       </p>
 
       <div className="mt-7 flex flex-wrap items-center gap-2">
@@ -55,7 +52,7 @@ export default async function PostsPage({
               : "border-line text-muted"
           }`}
         >
-          {t.postsPage.all}
+          All
         </Link>
         {categories.map((c) => (
           <Link
@@ -91,7 +88,7 @@ export default async function PostsPage({
       </div>
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-muted">{t.postsPage.empty}</p>
+        <p className="mt-16 text-center text-muted">No posts here yet — this chunk is still generating.</p>
       ) : (
         <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {posts.map((post) => (

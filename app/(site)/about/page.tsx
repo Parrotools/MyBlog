@@ -10,8 +10,6 @@ import {
   getProjects,
   getTimeline,
 } from "@/app/lib/content";
-import { dicts } from "@/app/lib/i18n";
-import { getLocale } from "@/app/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +29,6 @@ export default async function AboutPage() {
     getHotbar(),
     getTimeline(),
   ]);
-  const t = dicts[await getLocale()];
 
   return (
     <div className="relative overflow-hidden">
@@ -45,21 +42,20 @@ export default async function AboutPage() {
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-lime-400/25 bg-lime-400/10 px-4 py-1.5 text-xs font-medium text-accent">
               <span className="h-1.5 w-1.5 rounded-full bg-lime-400" />
-              {t.about.badge}
+              Player profile
             </p>
             <h1 className="text-4xl font-bold tracking-tight text-heading sm:text-5xl">
-              {t.hero.hi} {profile.name}
-              {t.hero.hiEnd}
+              Hi, I&apos;m {profile.name}.
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-muted">
               {profile.intro}
             </p>
             <dl className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                [t.about.class, profile.education],
-                [t.about.skills, profile.skills.join(" · ")],
-                [t.about.recording, profile.records.join(" · ")],
-                [t.about.contact, profile.email],
+                ["Class", profile.education],
+                ["Skills", profile.skills.join(" · ")],
+                ["Recording", profile.records.join(" · ")],
+                ["Contact", profile.email],
               ].map(([term, def]) => (
                 <div
                   key={term}
@@ -85,7 +81,7 @@ export default async function AboutPage() {
         {/* ============ hotbar ============ */}
         <section className="mt-20">
           <h2 className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            {t.sections.hotbar}
+            Daily hotbar
           </h2>
           <div className="-mt-24 overflow-x-auto pb-2 pt-24">
             <Hotbar slots={hotbar} />
@@ -95,7 +91,7 @@ export default async function AboutPage() {
         {/* ============ quest log / timeline ============ */}
         <section className="mt-20">
           <h2 className="mb-8 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            {t.about.questLog}
+            Quest log
           </h2>
           <ol className="relative space-y-8 border-l-2 border-line pl-8">
             {timeline.map((q) => (
@@ -113,7 +109,7 @@ export default async function AboutPage() {
                   {q.title}
                   {!q.done && (
                     <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
-                      {t.about.questAccepted}
+                      quest accepted
                     </span>
                   )}
                 </h3>
@@ -128,9 +124,9 @@ export default async function AboutPage() {
         {/* ============ interests as a poker hand ============ */}
         <section className="mt-20">
           <h2 className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            {t.about.cards}{" "}
+            Character cards{" "}
             <span className="normal-case tracking-normal">
-              {t.about.cardsHint}
+              — my interests
             </span>
           </h2>
           <PokerCards
@@ -146,10 +142,10 @@ export default async function AboutPage() {
         {/* ============ projects ============ */}
         <section className="mt-20">
           <h2 className="mb-8 text-sm font-semibold uppercase tracking-[0.25em] text-muted">
-            {t.about.showcase}
+            Build showcase
           </h2>
           {projects.length === 0 ? (
-            <p className="text-muted">{t.about.inFurnace}</p>
+            <p className="text-muted">Projects are still in the furnace.</p>
           ) : (
             <div className="grid gap-5 md:grid-cols-2">
               {projects.map((p) => (
@@ -193,17 +189,17 @@ export default async function AboutPage() {
         {/* ============ contact ============ */}
         <section className="mt-20 rounded-3xl border border-line bg-surface p-10 text-center">
           <h2 className="text-2xl font-bold text-heading">
-            {t.about.contactTitle}
+            Send a message in a bottle
           </h2>
           <p className="mx-auto mt-3 max-w-md text-muted">
-            {t.about.contactBody}
+            Questions about a post, ICPC, or something we could build together — my inbox is an open chest.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a
               href={`mailto:${profile.email}`}
               className="shine rounded-full bg-gradient-to-r from-lime-500 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_24px_rgba(132,204,22,0.35)] transition-transform hover:-translate-y-0.5"
             >
-              {t.about.emailMe}
+              Email me
             </a>
             <a
               href={profile.github}
@@ -211,7 +207,7 @@ export default async function AboutPage() {
               rel="noreferrer"
               className="press-btn rounded-full border border-line px-6 py-3 text-sm font-medium text-body"
             >
-              {t.about.github}
+              GitHub →
             </a>
           </div>
         </section>

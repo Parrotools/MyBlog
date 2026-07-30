@@ -4,7 +4,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import BlockIcon from "./BlockIcon";
 import HexMatrix from "./HexMatrix";
-import { useI18n } from "./I18nProvider";
 
 /**
  * Page-jump curtain (inspired by JIEJOE's jump-animation, the no-refresh
@@ -39,7 +38,6 @@ function isInternalPageLink(a: HTMLAnchorElement): string | null {
 }
 
 export default function PageJump() {
-  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -144,7 +142,7 @@ export default function PageJump() {
         />
       </div>
       <p className="font-mono text-xs font-semibold uppercase tracking-[0.4em] text-muted">
-        {t.jump.loading}
+        Loading
       </p>
     </div>
   );

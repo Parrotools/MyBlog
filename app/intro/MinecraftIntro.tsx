@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useI18n } from "@/app/components/I18nProvider";
 
 type UiPhase = "loading" | "tnt" | "reveal" | "gone";
 
 const MIN_LOAD_MS = 4200; // let the grass animation play at least this long
 
 export default function MinecraftIntro() {
-  const { t } = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -199,7 +197,7 @@ export default function MinecraftIntro() {
               ))}
             </div>
             <p className="mt-3 text-center text-xs font-medium uppercase tracking-[0.35em] text-zinc-300/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-              {t.intro.loadingWorld}
+              Loading world
             </p>
           </div>
         </div>
@@ -211,19 +209,9 @@ export default function MinecraftIntro() {
           onClick={() => setUiPhase("gone")}
           className="absolute right-5 top-5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-300 backdrop-blur-md transition-colors hover:bg-white/15 hover:text-white"
         >
-          {t.intro.skip}
+          Skip intro →
         </button>
       )}
-
-      {/* explosion flash + flythrough white-out overlays */}
-      <div
-        ref={flashRef}
-        className="pointer-events-none absolute inset-0 bg-white opacity-0"
-      />
-      <div
-        ref={whiteRef}
-        className="pointer-events-none absolute inset-0 bg-[#f4f9ff] opacity-0"
-      />
     </div>
   );
 }

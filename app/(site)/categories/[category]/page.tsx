@@ -4,8 +4,6 @@ import { notFound } from "next/navigation";
 import BlockIcon from "@/app/components/BlockIcon";
 import PostCard from "@/app/components/PostCard";
 import { getCategoryBySlug, getPublishedPosts } from "@/app/lib/content";
-import { dicts } from "@/app/lib/i18n";
-import { getLocale } from "@/app/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +30,6 @@ export default async function CategoryPage({
   const posts = (await getPublishedPosts()).filter(
     (p) => p.categorySlug === cat.slug
   );
-  const t = dicts[await getLocale()];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-14">
@@ -40,7 +37,7 @@ export default async function CategoryPage({
         href="/categories"
         className="sweep-link text-sm text-muted hover:text-heading"
       >
-        {t.categoriesPage.allCategories}
+        ← All categories
       </Link>
       <div className="mt-6 flex items-center gap-4">
         <BlockIcon variant={cat.icon} className="h-14 w-14" />
@@ -54,7 +51,7 @@ export default async function CategoryPage({
 
       {posts.length === 0 ? (
         <p className="mt-16 text-center text-muted">
-          {t.categoriesPage.emptyRegion}
+          No posts in this region yet.
         </p>
       ) : (
         <div className="mt-10 grid gap-5 sm:grid-cols-2">

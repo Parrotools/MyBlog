@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useI18n } from "./I18nProvider";
 import type { Heading } from "../lib/markdown";
 
 export default function TableOfContents({ headings }: { headings: Heading[] }) {
-  const { t } = useI18n();
   const [active, setActive] = useState<string>("");
 
   useEffect(() => {
@@ -29,7 +27,7 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
   return (
     <nav aria-label="Table of contents">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-muted">
-        {t.article.onThisPage}
+        On this page
       </p>
       <ul className="space-y-0.5 border-l border-line text-sm">
         {headings.map((h) => (
