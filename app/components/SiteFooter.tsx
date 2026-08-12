@@ -114,6 +114,14 @@ export default async function SiteFooter({
             </span>
             <span>© 2026 {profile.name} — built with Next.js, Three.js and one block of TNT</span>
           </div>
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-muted/70 hover:text-heading"
+          >
+            鄂ICP备2025146739号
+          </a>
           {site.footerNote && (
             <p className="text-xs text-muted/70">{site.footerNote}</p>
           )}
