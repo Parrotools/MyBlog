@@ -33,14 +33,14 @@ export default async function Home({
       searchParams,
     ]);
   const latest = posts.slice(0, 4);
-  // the 3D intro plays once per browser session (cookie set on finish/skip);
-  // /?intro=1 forces a replay any time
-  const introSeen = params.intro !== "1" && cookieStore.has("intro_seen");
+  // First visits are handled by the shared site layout. Keep /?intro=1 as
+  // the explicit replay path without mounting a second intro on first visit.
+  const forceIntro = params.intro === "1" && cookieStore.has("intro_seen");
 
   return (
     <>
       {/* fullscreen 3D intro overlay; removes itself once the camera flies through */}
-      {!introSeen && <MinecraftIntro />}
+      {forceIntro && <MinecraftIntro />}
 
       <div className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
